@@ -1,11 +1,14 @@
 package main
 
 import (
-	"fmt"
+	// "fmt"
 	"math/rand"
 	// "math"
 )
 
+/*
+	Card and deck structures
+*/
 type Card struct {
 	value, suit int
 }
@@ -56,21 +59,4 @@ func (d *Deck) DealCard() Card {
 	d.topCardIndex--
 
 	return topCard
-}
-
-func main() {
-	//init deck of cards
-	var newDeck = Deck{}
-	newDeck.BuildDeck()
-
-	//shuffle deck of cards
-	newDeck.Shuffle()
-
-	fmt.Println("\nnewDeck: ", newDeck)
-
-	c := newDeck.DealCard()
-	fmt.Print("\ntop card: ", c)
-	fmt.Print("\nnewDeck after dealcard; ", newDeck)
-	fmt.Print("\nnewDeck.topCardIndex; ", newDeck.topCardIndex)
-	fmt.Print("\n")
 }

@@ -4,4 +4,4 @@
 
 To run code in the folder /ginbot,
 
-        go run cmd/main.go
+        go run cmd/GameBoard/main.go
