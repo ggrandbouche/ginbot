@@ -12,10 +12,6 @@ type Card struct {
 	value, suit int
 }
 
-type GameBoardOpps interface {
-	InitializeBoard()
-}
-
 type GameBoard struct {
 	deck []Card
 	hand1 []Card
