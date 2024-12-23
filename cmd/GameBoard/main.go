@@ -1,10 +1,9 @@
 package main
 
-
 import (
 	"fmt"
 	"math/rand/v2"
-  "strings"
+	"strings"
 )
 
 /*
@@ -77,18 +76,6 @@ func PrintHand(hand []Card) {
     str = str[:len(str)-2]
     fmt.Println(str)
 }
-
-// //function to shuffle a deck of cards into a random order
-// func (d *Deck) Shuffle() {
-// 	// go's math/rand std lib comes with a shuffle funciton.
-// 	// it expects the number of items and a the function to perform a swap,
-// 	// which is super easy in go thanks this wierd syntax
-// 	rand.Shuffle(
-// 		len(d.my_deck), // num items
-// 		func(i, j int) { //swap function
-// 			d.my_deck[i], d.my_deck[j] = d.my_deck[j], d.my_deck[i]
-// 		})
-// }
 
 func (board *GameBoard) DealCard() Card {
 	var card Card = board.deck[len(board.deck)-1]
