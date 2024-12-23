@@ -1,17 +1,17 @@
 package main
 
-import "fmt"
-import "strings"
+
+import (
+	"fmt"
+	"math/rand/v2"
+  "strings"
+)
 
 /*
 Game board structures
 */
 type Card struct {
 	value, suit int
-}
-
-type GameBoardOpps interface {
-	InitializeBoard()
 }
 
 type GameBoard struct {
@@ -34,28 +34,24 @@ func (board *GameBoard) IntitializeBoard() {
 
 }
 
+//function to shuffle a deck of cards into a random order
+func (board *GameBoard) Shuffle() {
+	// go's math/rand std lib comes with a shuffle funciton.
+	// it expects the number of items and a the function to perform a swap, 
+	// which is super easy in go thanks this wierd syntax
+	rand.Shuffle(
+		len(board.deck), // num items
+		func(i, j int) { //swap function
+			board.deck[i], board.deck[j] = board.deck[j], board.deck[i]
+		})
+
+}
+
 func main() {
-	//Test Deck
-	// //init deck of cards
-	// var newDeck = Deck{}
-	// newDeck.BuildDeck()
-
-	// //shuffle deck of cards
-	// newDeck.Shuffle()
-
-	// fmt.Println("\nnewDeck: ", newDeck)
-
-	// c := newDeck.DealCard()
-	// fmt.Print("\ntop card: ", c)
-	// fmt.Print("\nnewDeck after dealcard; ", newDeck, )
-	// fmt.Println("\nnewDeck.topCardIndex; ", newDeck.topCardIndex)
-
-	// //reset deck
-	// newDeck.BuildDeck()
-	// newDeck.Shuffle()
-
 	var board = GameBoard{}
 	board.IntitializeBoard()
+
+    board.Shuffle()
     board.DealHands()
     PrintHand(board.hand1)
 }
