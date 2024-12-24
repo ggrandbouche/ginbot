@@ -46,15 +46,6 @@ func (board *GameBoard) Shuffle() {
 
 }
 
-func main() {
-	var board = GameBoard{}
-	board.IntitializeBoard()
-
-    board.Shuffle()
-    board.DealHands()
-    PrintHand(board.hand1)
-}
-
 func (board *GameBoard) DealHands() {
 	for i := 0; i < 20; i++ {
 		if i%2 == 0 {
@@ -67,7 +58,7 @@ func (board *GameBoard) DealHands() {
 
 func PrintHand(hand []Card) {
 	value := []string{"Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"}
-	suit := []string{"♥", "♦", "♣", "♠"}
+	suit := []string{"♠", "♦", "♣", "♥"}
     var builder strings.Builder
 	for _, card := range hand {
 		builder.WriteString(fmt.Sprintf("%s%s, ", value[card.value], suit[card.suit]))
@@ -83,3 +74,38 @@ func (board *GameBoard) DealCard() Card {
 	return card
 }
 
+func (board * GameBoard) SortHands() {
+	board.hand1 = sortHand(board.hand1)
+	board.hand2 = sortHand(board.hand2)
+}
+
+func sortHand(hand []Card) []Card {
+	for i := 0; i < len(hand) - 1; i++ {
+		min := i
+		for j := i+1; j < len(hand); j++ {
+			if (hand[j].value + hand[j].suit*13 < hand[min].value + hand[min].suit*13){
+				min = j
+			}
+		}
+		//perform swap
+		temp := hand[i]
+		hand[i] = hand[min]
+		hand[min] = temp
+	}
+
+	return hand
+}
+
+
+func main() {
+	var board = GameBoard{}
+	board.IntitializeBoard()
+
+    board.Shuffle()
+    board.DealHands()
+	board.SortHands()
+	
+	PrintHand(board.hand1)
+	PrintHand(board.hand2)
+
+}
