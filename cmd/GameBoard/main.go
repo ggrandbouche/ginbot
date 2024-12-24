@@ -102,18 +102,18 @@ func groupify(hand []Card) int {
 
 func findStraight(hand []Card, straight [][]Card) [][]Card{
     for i := 0; i < len(hand) - 2; i++ {
-        if(hand[i].suit == hand[i+2].suit){
-            if(hand[i].value - hand[i+2].value == -2){
+        if(hand[i].suit == hand[i+2].suit && hand[i].value - hand[i+2].value == -2){
                 group := []Card{hand[i], hand[i+1], hand[i+2]} 
                 for j := i+3; j < len(hand); j++ {
-                    if(hand[j].suit == hand[i+2].suit){
-                        if(hand[j].value - hand[j-1].value == 1) {
-                            group = append(group, hand[j])
-                        }
+                    if(hand[j].suit == hand[j-1].suit && hand[j].value - hand[j-1].value == 1){
+                        group = append(group, hand[j])
+                        i = j - 1
+                    }else{
+                        i = j - 1
+                        break
                     }
                 }
                 straight = append(straight, group)
-            }
         }
     }
     return straight
@@ -127,11 +127,15 @@ func main() {
 	board.DealHands()
 	board.SortHands()
 
-	printHand(board.hand1)
-	printHand(board.hand2)
 
     var straight [][]Card
-    straight = findStraight(board.hand1, straight)
+    test := []Card{{value: 1, suit: 0},{value: 2, suit: 0},{value: 3, suit: 0},
+        {value: 4, suit: 0},{value: 7, suit: 0},{value: 8, suit: 0},{value: 9, suit: 0},
+        {value: 10, suit: 0},{value: 1, suit: 0},{value: 2, suit: 0},{value: 3, suit: 0},
+        {value: 4, suit: 0},{value: 7, suit: 0},{value: 8, suit: 0},{value: 9, suit: 0},
+        {value: 10, suit: 0}}
+    printHand(test)
+    straight = findStraight(test, straight)
     fmt.Println(straight)
 }
 
