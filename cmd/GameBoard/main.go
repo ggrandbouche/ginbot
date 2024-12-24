@@ -56,7 +56,7 @@ func (board *GameBoard) DealHands() {
 	}
 }
 
-func PrintHand(hand []Card) {
+func printHand(hand []Card) {
 	value := []string{"Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"}
 	suit := []string{"♠", "♦", "♣", "♥"}
     var builder strings.Builder
@@ -105,7 +105,7 @@ func main() {
     board.DealHands()
 	board.SortHands()
 	
-	PrintHand(board.hand1)
-	PrintHand(board.hand2)
+	printHand(board.hand1)
+	printHand(board.hand2)
 
 }
