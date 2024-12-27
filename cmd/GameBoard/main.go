@@ -97,10 +97,14 @@ func sortHand(hand []Card) []Card {
 }
 
 func groupify(hand []Card) int {
+	//get the straights
+	//get the pairs
+	//compare point values
     return 0
 }
 
-func findStraight(hand []Card, straight [][]Card) [][]Card{
+func findStraights(hand []Card) [][]Card{
+	var straight [][]Card
     for i := 0; i < len(hand) - 2; i++ {
         if(hand[i].suit == hand[i+2].suit && hand[i].value - hand[i+2].value == -2){
                 group := []Card{hand[i], hand[i+1], hand[i+2]} 
@@ -119,6 +123,33 @@ func findStraight(hand []Card, straight [][]Card) [][]Card{
     return straight
 }
 
+func findMatches(hand []Card) [][]Card {
+	//slice to return - has all card slices with 3-4 cards
+	var matches [][]Card
+	//map for all card value matches of 1-4 cards
+	var allMatches = make(map[int][]Card)
+	//loop through hand
+	for i := 0; i < len(hand); i++ {
+		//get the value and existence boolean 
+		//from the map for the current card value
+		val, keyExists := allMatches[hand[i].value]
+		if (keyExists) {
+			//add this card to the appropriate group
+			allMatches[hand[i].value] = append(val, hand[i])
+		} else {
+			//make new group in map
+			allMatches[hand[i].value] = []Card{hand[i]}
+		}
+	}
+	//loop through groups to return the groups of 3+ cards
+	for _, match := range allMatches {
+		if len(match) >= 3 {
+			matches = append(matches, match)
+		}
+	}
+	return matches
+}
+
 func main() {
 	var board = GameBoard{}
 	board.IntitializeBoard()
@@ -128,14 +159,13 @@ func main() {
 	board.SortHands()
 
 
-    var straight [][]Card
-    test := []Card{{value: 1, suit: 0},{value: 2, suit: 0},{value: 3, suit: 0},
-        {value: 4, suit: 0},{value: 7, suit: 0},{value: 8, suit: 0},{value: 9, suit: 0},
-        {value: 10, suit: 0},{value: 1, suit: 0},{value: 2, suit: 0},{value: 3, suit: 0},
-        {value: 4, suit: 0},{value: 7, suit: 0},{value: 8, suit: 0},{value: 9, suit: 0},
-        {value: 10, suit: 0}}
+    
+    // test := []Card{{value: 1, suit: 0},{value: 2, suit: 0},{value: 2, suit: 1},
+    //     {value: 4, suit: 0},{value: 7, suit: 0},{value: 2, suit: 0},{value: 9, suit: 0},
+    //     {value: 2, suit: 0}}
+	test := board.hand1
     printHand(test)
-    straight = findStraight(test, straight)
+    var straight [][]Card = findMatches(test)
     fmt.Println(straight)
 }
 
