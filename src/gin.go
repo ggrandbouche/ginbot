@@ -20,7 +20,10 @@ func gameLoop(board *GameBoard) (bool, int){
         fmt.Print("\n> ")
         fmt.Scan(&input)
         if input == 1 {
-            board.hand1 = append(board.hand1, board.DealCard())
+            var deltCard = board.DealCard()
+            board.hand1 = append(board.hand1, deltCard)
+            fmt.Print("You drew: ")
+            printCard(deltCard)
         } else if input == 2 {
             board.hand1 = append(board.hand1, board.discard[len(board.discard)-1])
             board.discard = board.discard[:len(board.discard)-1]
@@ -58,7 +61,10 @@ func gameLoop(board *GameBoard) (bool, int){
         fmt.Print("\n> ")
         fmt.Scan(&input)
         if input == 1 {
-            board.hand2 = append(board.hand2, board.DealCard())
+            var deltCard = board.DealCard()
+            board.hand2 = append(board.hand1, deltCard)
+            fmt.Print("You drew: ")
+            printCard(deltCard)
         } else if input == 2 {
             board.hand2 = append(board.hand2, board.discard[len(board.discard)-1])
             board.discard = board.discard[:len(board.discard)-1]
