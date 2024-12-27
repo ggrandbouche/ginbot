@@ -66,7 +66,7 @@ func gameLoop(board *GameBoard) (bool, int) {
 		fmt.Scan(&input)
 		if input == 1 {
 			var deltCard = board.DealCard()
-			board.hand2 = append(board.hand1, deltCard)
+			board.hand2 = append(board.hand2, deltCard)
 			fmt.Print("You drew: ")
 			printCard(deltCard)
 		} else if input == 2 {
