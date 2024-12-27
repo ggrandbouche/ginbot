@@ -29,6 +29,7 @@ func gameLoop(board *GameBoard) (bool, int){
             board.discard = board.discard[:len(board.discard)-1]
         }
         fmt.Print("Please enter the index of the card you would like to discard, starting at index 0\n> ")
+		printHand(board.hand1)
         fmt.Scan(&input)
         board.discard = append(board.discard, board.hand1[input])
         board.hand1 = append(board.hand1[:input], board.hand1[input+1:]...)
@@ -70,6 +71,7 @@ func gameLoop(board *GameBoard) (bool, int){
             board.discard = board.discard[:len(board.discard)-1]
         }
         fmt.Print("Please enter the index of the card you would like to discard, starting at index 0\n> ")
+		printHand(board.hand2)
         fmt.Scan(&input)
         board.discard = append(board.discard, board.hand2[input])
         board.hand2 = append(board.hand2[:input], board.hand2[input+1:]...)
