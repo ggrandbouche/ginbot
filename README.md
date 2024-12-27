@@ -8,6 +8,4 @@ To run code in the folder ginbot/src,
 
 To run code in the folder /ginbot,
 
-        go run src/main.go src/gin.go src/gameboard.go
-
-        
+        go run src/*
