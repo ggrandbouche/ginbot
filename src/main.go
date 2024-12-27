@@ -34,13 +34,13 @@ func main() {
 		if pointsWon == 0 {
 		} else if player1Wins {
 			p1.points += pointsWon
-			fmt.Println("%s gained %d points. ", p1.name, pointsWon)
+			fmt.Printf("%s gained %d points. \n", p1.name, pointsWon)
 		} else {
 			p2.points += pointsWon
-			fmt.Println("%s gained %d points. ", p2.name, pointsWon)
+			fmt.Printf("%s gained %d points. \n", p2.name, pointsWon)
 		}
-		fmt.Println("%s has %d points. ", p1.name, p1.points)
-		fmt.Println("%s has %d points. ", p2.name, p2.points)
+		fmt.Printf("%s has %d points. \n", p1.name, p1.points)
+		fmt.Printf("%s has %d points. \n", p2.name, p2.points)
 		
 		var s string = ""
 		for !(s=="p" || s=="P" || s=="q" || s=="Q"){

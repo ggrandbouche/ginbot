@@ -56,7 +56,7 @@ func gameLoop(board *GameBoard) (bool, int) {
 				}
 			}
 		}
-		fmt.Println("\n\n\n")
+		fmt.Print("\n\n\n\n")
 		fmt.Println("Player 2's hand: ")
 		printHand(board.hand2)
 		fmt.Println("Draw new card(1) or take top of discard pile(2)")
@@ -101,7 +101,7 @@ func gameLoop(board *GameBoard) (bool, int) {
 				}
 			}
 		}
-		fmt.Println("\n\n\n")
+		fmt.Print("\n\n\n\n")
 	}
 	return true, 0
 }
