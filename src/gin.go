@@ -14,7 +14,7 @@ func gameLoop(board *GameBoard) (bool, int){
         fmt.Println("Draw new card(1) or take top of discard pile(2)")
         fmt.Print("This is the top of the discard pile: ")
         printCard(board.discard[len(board.discard)-1])
-        fmt.Println("> ")
+        fmt.Println("\n> ")
         fmt.Scan(&input)
         if input == 1 {
             board.hand1 = append(board.hand1, board.DealCard())
