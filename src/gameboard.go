@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math/rand/v2"
-	"strings"
 )
 
 /*
@@ -57,15 +56,16 @@ func (board *GameBoard) DealHands() {
 }
 
 func printHand(hand []Card) {
+	for _, card := range hand {
+		printCard(card)
+	}
+	fmt.Println()
+}
+
+func printCard(card Card) {
 	value := []string{"Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"}
 	suit := []string{"♠", "♦", "♣", "♥"}
-	var builder strings.Builder
-	for _, card := range hand {
-		builder.WriteString(fmt.Sprintf("%s%s, ", value[card.value], suit[card.suit]))
-	}
-	str := builder.String()
-	str = str[:len(str)-2]
-	fmt.Println(str)
+	fmt.Printf("%s%s, ", value[card.value], suit[card.suit])
 }
 
 func (board *GameBoard) DealCard() Card {
@@ -99,17 +99,14 @@ func sortHand(hand []Card) []Card {
 func groupify(hand []Card) int {
 	//get the straights
 	straights := findStraights(hand)
-	fmt.Println(straights)
 	//get the pairs
 	matches := findMatches(hand)
-	fmt.Println(matches)
 	//find conflicts
 	for a, straight := range straights {
 		for b, straightCard := range straight {
 			for c, match := range matches {
 				for d, matchCard := range match {
 					if straightCard == matchCard {
-						fmt.Println("found conflict for card ", match[d])
 						//check if one group is length 4, keep it there
 						if (len(straights[a]) > 3 && (b == 0 || b == len(straights[a])-1)) { //remove from this one
 							straights[a] = append(straights[a][:b], straights[a][b+1:]...)
@@ -136,10 +133,6 @@ func groupify(hand []Card) int {
 			}
 		}
 	}
-
-	fmt.Println(straights)
-	fmt.Println(matches)
-
 	//calculate hand total
 	handTotal := calcTotal(hand) - calcTotalGroups(straights) - calcTotalGroups(matches)
 	
