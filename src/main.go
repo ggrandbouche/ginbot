@@ -28,7 +28,7 @@ func main() {
 	var playing bool = true
 	//beginning game
 	for playing {
-		var player1Wins, pointsWon = gameLoop(board)
+		var player1Wins, pointsWon = gameLoop(&board)
 		
 		//keep track of points
 		if pointsWon == 0 {
