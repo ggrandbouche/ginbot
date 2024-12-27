@@ -9,6 +9,9 @@ func gameLoop(board *GameBoard) (bool, int){
 
 	for !gameOver {
         var input int 
+
+        board.SortHands()
+
 		fmt.Println("Player 1's hand: ")
 		printHand(board.hand1)
         fmt.Println("Draw new card(1) or take top of discard pile(2)")
