@@ -13,7 +13,7 @@ func gameLoop(board *GameBoard) (bool, int){
 		printHand(board.hand1)
         fmt.Println("Draw new card(1) or take top of discard pile(2)")
         fmt.Print("This is the top of the discard pile: ")
-        printCard(board.discard[len(board.discard)])
+        printCard(board.discard[len(board.discard)-1])
         fmt.Println("> ")
         fmt.Scan(&input)
         if input == 1 {
