@@ -30,7 +30,6 @@ func (board *GameBoard) IntitializeBoard() {
 	board.hand1 = make([]Card, 0, 11)
 	board.hand2 = make([]Card, 0, 11)
 	board.discard = make([]Card, 0, 52)
-
 }
 
 // function to shuffle a deck of cards into a random order
@@ -54,18 +53,20 @@ func (board *GameBoard) DealHands() {
 			board.hand2 = append(board.hand2, board.DealCard())
 		}
 	}
+    board.discard = append(board.discard, board.DealCard())
 }
 
 func printHand(hand []Card) {
+	for _, card := range hand {
+		printCard(card)
+	}
+	fmt.Println()
+}
+
+func printCard(card Card) {
 	value := []string{"Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"}
 	suit := []string{"♠", "♦", "♣", "♥"}
-	var builder strings.Builder
-	for _, card := range hand {
-		builder.WriteString(fmt.Sprintf("%s%s, ", value[card.value], suit[card.suit]))
-	}
-	str := builder.String()
-	str = str[:len(str)-2]
-	fmt.Println(str)
+	fmt.Printf("%s%s, ", value[card.value], suit[card.suit])
 }
 
 func (board *GameBoard) DealCard() Card {
