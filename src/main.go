@@ -47,7 +47,7 @@ func main() {
 			fmt.Println("\n\n\tThanks for playing! Enter P to play again or Q to quit.")
 			fmt.Scan(&s)
 			if s == "q" || s == "Q" {
-				break
+				return
 			} else if s == "p" || s == "P" {
 				continue
 			}
