@@ -28,10 +28,11 @@ func main() {
 	var playing bool = true
 	//beginning game
 	for playing {
-		var player1Wins, pointsWon = gameLoop(&board)
+		var player1Wins, pointsWon = gameLoop(&board, p1, p2)
 		
 		//keep track of points
 		if pointsWon == 0 {
+			//do nothing
 		} else if player1Wins {
 			p1.points += pointsWon
 			fmt.Printf("%s gained %d points. \n", p1.name, pointsWon)

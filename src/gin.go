@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func gameLoop(board *GameBoard) (bool, int) {
+func gameLoop(board *GameBoard, p1 Player, p2 Player) (bool, int) {
 	var gameOver = false
 
 	for !gameOver {
@@ -12,96 +12,115 @@ func gameLoop(board *GameBoard) (bool, int) {
 
 		board.SortHands()
 
-		fmt.Println("Player 1's hand: ")
+		fmt.Print("\n\n\n-----------------------------------------\n")
+		fmt.Printf("\n%s's hand: ", p1.name)
 		printHand(board.hand1)
-		fmt.Println("Draw new card(1) or take top of discard pile(2)")
 		fmt.Print("This is the top of the discard pile: ")
 		printCard(board.discard[len(board.discard)-1])
-		fmt.Print("\n> ")
+		fmt.Println("\nDraw new card(1) or take top of discard pile(2)")
+		fmt.Print("> ")
 		fmt.Scan(&input)
 		if input == 1 {
 			var deltCard = board.DealCard()
 			board.hand1 = append(board.hand1, deltCard)
 			fmt.Print("You drew: ")
 			printCard(deltCard)
+			fmt.Println()
 		} else if input == 2 {
 			board.hand1 = append(board.hand1, board.discard[len(board.discard)-1])
 			board.discard = board.discard[:len(board.discard)-1]
+		} else {
+			fmt.Println("Please enter 1 or 2!")
 		}
 		fmt.Println("Please enter the index of the card you would like to discard, starting at index 0")
 		sortHand(board.hand1)
 		printHand(board.hand1)
+		fmt.Println("[0]  [1]  [2]  [3]  [4]  [5]  [6]  [7]  [8]  [9]  [10]")
 		fmt.Print("> ")
 		fmt.Scan(&input)
 		board.discard = append(board.discard, board.hand1[input])
 		board.hand1 = append(board.hand1[:input], board.hand1[input+1:]...)
-		if groupify(board.hand1) == 0 {
-			fmt.Println("Player one goes gin!")
-			return true, groupify(board.hand2) + 20
-		} else if groupify(board.hand1) <= 10 {
-			fmt.Println("Would you like to knock? yes(1), no(2)\n> ")
+		P1_pts := groupify(board.hand1)
+		P2_pts := groupify(board.hand2)
+		fmt.Printf("You have %d deadwood points in your hand\n", P1_pts)
+		if P1_pts == 0 {
+			fmt.Printf("%s goes gin!", p1.name)
+			return true, P2_pts + 25
+		} else if P1_pts <= 10 {
+			fmt.Printf("Would you like to knock with %d points? yes(1), no(2)\n> ", P1_pts)
 			fmt.Scan(&input)
 			if input == 1 {
-				var points = groupify(board.hand2) - groupify(board.hand1)
-				if points > 0 {
-					fmt.Println("Player one wins with a knock")
-					return true, points
-				} else if points < 0 {
-					fmt.Println("Player two wins on the knock")
-					points = -points
-					return false, points
+				fmt.Printf("%s has %d deadwood points.\n%s has %d deadwood points.\n", 
+							p1.name, P1_pts, p2.name, P2_pts)
+				var pointDiff = P2_pts - P1_pts
+				if pointDiff > 0 {
+					fmt.Printf("%s wins with a knock! \n", p1.name)
+					return true, pointDiff
+				} else if pointDiff < 0 {
+					fmt.Printf("%s undercuts the knock! \n", p2.name)
+					pointDiff = -pointDiff
+					return false, pointDiff + 20
 				} else {
-					fmt.Println("Players tied on the knock")
-					return true, points
+					fmt.Println("Players tied on the knock! ")
+					return true, pointDiff
 				}
 			}
 		}
-		fmt.Print("\n\n\n\n")
-		fmt.Println("Player 2's hand: ")
+
+		//Player 2's turn
+		fmt.Print("\n\n\n-----------------------------------------\n")
+		fmt.Printf("\n%s's hand: ", p2.name)
 		printHand(board.hand2)
-		fmt.Println("Draw new card(1) or take top of discard pile(2)")
 		fmt.Print("This is the top of the discard pile: ")
 		printCard(board.discard[len(board.discard)-1])
-		fmt.Print("\n> ")
+		fmt.Print("\nDraw new card(1) or take top of discard pile(2)\n> ")
 		fmt.Scan(&input)
 		if input == 1 {
 			var deltCard = board.DealCard()
 			board.hand2 = append(board.hand2, deltCard)
 			fmt.Print("You drew: ")
 			printCard(deltCard)
+			fmt.Println()
 		} else if input == 2 {
 			board.hand2 = append(board.hand2, board.discard[len(board.discard)-1])
 			board.discard = board.discard[:len(board.discard)-1]
+		} else {
+			fmt.Println("Please enter 1 or 2!")
 		}
 		fmt.Println("Please enter the index of the card you would like to discard, starting at index 0")
 		sortHand(board.hand2)
 		printHand(board.hand2)
+		fmt.Println("[0]  [1]  [2]  [3]  [4]  [5]  [6]  [7]  [8]  [9]  [10]")
 		fmt.Print("> ")
 		fmt.Scan(&input)
 		board.discard = append(board.discard, board.hand2[input])
 		board.hand2 = append(board.hand2[:input], board.hand2[input+1:]...)
-		if groupify(board.hand2) == 0 {
-			fmt.Println("Player one goes gin!")
-			return true, groupify(board.hand1) + 20
-		} else if groupify(board.hand2) <= 10 {
-			fmt.Println("Would you like to knock? yes(1), no(2)\n> ")
+		P1_pts = groupify(board.hand1)
+		P2_pts = groupify(board.hand2)
+		fmt.Printf("You have %d deadwood points in your hand\n", P2_pts)
+		if P2_pts == 0 {
+			fmt.Printf("%s goes gin!\n", p2.name)
+			return true, P1_pts + 25
+		} else if P2_pts <= 10 {
+			fmt.Printf("Would you like to knock with %d points? yes(1), no(2)\n> ", P2_pts)
 			fmt.Scan(&input)
 			if input == 1 {
-				var points = groupify(board.hand1) - groupify(board.hand2)
-				if points > 0 {
-					fmt.Println("Player one wins with a knock")
-					return true, points
-				} else if points < 0 {
-					fmt.Println("Player two wins on the knock")
-					points = -points
-					return false, points
+				fmt.Printf("%s has %d deadwood points.\n%s has %d deadwood points.\n", 
+							p1.name, P1_pts, p2.name, P2_pts)
+				var pointDiff = P2_pts - P1_pts
+				if pointDiff > 0 {
+					fmt.Printf("%s wins with a knock! ", p2.name)
+					return false, pointDiff
+				} else if pointDiff < 0 {
+					fmt.Printf("%s undercuts the knock! ", p1.name)
+					pointDiff = -pointDiff
+					return true, pointDiff
 				} else {
-					fmt.Println("Players tied on the knock")
-					return true, points
+					fmt.Println("Players tied on the knock! ")
+					return true, pointDiff
 				}
 			}
 		}
-		fmt.Print("\n\n\n\n")
 	}
 	return true, 0
 }

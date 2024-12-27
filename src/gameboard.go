@@ -56,16 +56,19 @@ func (board *GameBoard) DealHands() {
 }
 
 func printHand(hand []Card) {
-	for _, card := range hand {
-		printCard(card)
+	value := []string{" A", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", "10", " J", " Q", " K"}
+	suit := []string{"♠", "♦", "♣", "♥"}
+	for x, card := range hand {
+		fmt.Printf("%s%s", value[card.value], suit[card.suit])
+		if (x != len(hand)-1) {fmt.Print(", ")}
 	}
 	fmt.Println()
 }
 
 func printCard(card Card) {
-	value := []string{"Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"}
+	value := []string{" A", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", "10", " J", " Q", " K"}
 	suit := []string{"♠", "♦", "♣", "♥"}
-	fmt.Printf("%s%s, ", value[card.value], suit[card.suit])
+	fmt.Printf(" %s%s ", value[card.value], suit[card.suit])
 }
 
 func (board *GameBoard) DealCard() Card {
@@ -131,6 +134,17 @@ func groupify(hand []Card) int {
 					}
 				}
 			}
+		}
+	}
+	//remove groups of len < 3
+	for x,straight := range straights {
+		if len(straight) < 3 {
+			straights = append(straights[:x], straights[x+1:]...)
+		}
+	}
+	for y,match := range matches {
+		if len(match) < 3 {
+			matches = append(matches[:y], matches[y+1:]...)
 		}
 	}
 	//calculate hand total
