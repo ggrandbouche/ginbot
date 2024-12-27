@@ -14,12 +14,12 @@ func gameLoop(board *GameBoard) (bool, int){
         fmt.Println("Draw new card(1) or take top of discard pile(2)")
         fmt.Print("This is the top of the discard pile: ")
         printCard(board.discard[len(board.discard)-1])
-        fmt.Println("\n> ")
+        fmt.Print("\n> ")
         fmt.Scan(&input)
         if input == 1 {
             board.hand1 = append(board.hand1, board.DealCard())
         } else if input == 2 {
-            board.hand1 = append(board.hand1, board.discard[len(board.discard)])
+            board.hand1 = append(board.hand1, board.discard[len(board.discard)-1])
             board.discard = board.discard[:len(board.discard)-1]
         }
         fmt.Println("Please enter the index of the card you would like to discard, starting at index 0\n> ")
@@ -51,13 +51,13 @@ func gameLoop(board *GameBoard) (bool, int){
 		printHand(board.hand2)
         fmt.Println("Draw new card(1) or take top of discard pile(2)")
         fmt.Print("This is the top of the discard pile: ")
-        printCard(board.discard[len(board.discard)])
-        fmt.Println("\n> ")
+        printCard(board.discard[len(board.discard)-1])
+        fmt.Print("\n> ")
         fmt.Scan(&input)
         if input == 1 {
             board.hand2 = append(board.hand2, board.DealCard())
         } else if input == 2 {
-            board.hand2 = append(board.hand2, board.discard[len(board.discard)])
+            board.hand2 = append(board.hand2, board.discard[len(board.discard)-1])
             board.discard = board.discard[:len(board.discard)-1]
         }
         fmt.Println("Please enter the index of the card you would like to discard, starting at index 0\n> ")
