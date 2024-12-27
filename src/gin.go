@@ -52,7 +52,7 @@ func gameLoop(board *GameBoard) (bool, int){
         fmt.Println("Draw new card(1) or take top of discard pile(2)")
         fmt.Print("This is the top of the discard pile: ")
         printCard(board.discard[len(board.discard)])
-        fmt.Print("> ")
+        fmt.Println("\n> ")
         fmt.Scan(&input)
         if input == 1 {
             board.hand2 = append(board.hand2, board.DealCard())
@@ -60,8 +60,7 @@ func gameLoop(board *GameBoard) (bool, int){
             board.hand2 = append(board.hand2, board.discard[len(board.discard)])
             board.discard = board.discard[:len(board.discard)-1]
         }
-        fmt.Println(`Please enter the index of the card you would like to discard,
-            starting at index 0\n> `)
+        fmt.Println("Please enter the index of the card you would like to discard, starting at index 0\n> ")
         fmt.Scan(&input)
         board.discard = append(board.discard, board.hand2[input])
         board.hand2 = append(board.hand2[:input], board.hand2[input+1:]...)
