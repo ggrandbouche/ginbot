@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math/rand/v2"
-	"strings"
 )
 
 /*
@@ -100,17 +99,14 @@ func sortHand(hand []Card) []Card {
 func groupify(hand []Card) int {
 	//get the straights
 	straights := findStraights(hand)
-	fmt.Println(straights)
 	//get the pairs
 	matches := findMatches(hand)
-	fmt.Println(matches)
 	//find conflicts
 	for a, straight := range straights {
 		for b, straightCard := range straight {
 			for c, match := range matches {
 				for d, matchCard := range match {
 					if straightCard == matchCard {
-						fmt.Println("found conflict for card ", match[d])
 						//check if one group is length 4, keep it there
 						if (len(straights[a]) > 3 && (b == 0 || b == len(straights[a])-1)) { //remove from this one
 							straights[a] = append(straights[a][:b], straights[a][b+1:]...)
@@ -137,10 +133,6 @@ func groupify(hand []Card) int {
 			}
 		}
 	}
-
-	fmt.Println(straights)
-	fmt.Println(matches)
-
 	//calculate hand total
 	handTotal := calcTotal(hand) - calcTotalGroups(straights) - calcTotalGroups(matches)
 	
