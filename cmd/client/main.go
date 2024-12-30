@@ -1,28 +1,44 @@
 package main
 
 import (
-    "fmt"
-    "log"
-    "github/ggrandbouche/ginbot/pkg/network"
+    "net"
+    "os"
+)
+
+const (
+    HOST = "18.189.13.250"
+    PORT = "8080"
+    TYPE = "tcp"
 )
 
 func main() {
-    serverAddress := "3.139.65.34:8080"
-
-    conn, err := network.ConnectToServer(serverAddress)
+    tcpServer, err := net.ResolveTCPAddr(TYPE, HOST+":"+PORT)
     if err != nil {
-        log.Fatal("Error connecting to server:", err)
-    }
-    defer conn.Close()
-
-    message := "Hello from client"
-    if err := network.SendMessage(conn, message); err != nil {
-        log.Fatal("Error sending message:", err)
+        println("ResolveTCPAddr failed:", err.Error())
+        os.Exit(1)
     }
 
-    response, err := network.ReceiveMessage(conn)
+    conn, err := net.DialTCP(TYPE, nil, tcpServer)
     if err != nil {
-        log.Fatal("Error receiving message:", err)
+        println("Dial failed:", err.Error())
+        os.Exit(1)
     }
-    fmt.Println("Server response:", response)
+
+    _, err = conn.Write([]byte("This is a message"))
+    if err != nil {
+        println("Write data failed:", err.Error())
+        os.Exit(1)
+    }
+    
+    received := make([]byte, 1024)
+    _, err = conn.Read(received)
+    if err != nil {
+        println("Read data failed:", err.Error())
+        os.Exit(1)
+    }
+    
+    println("Received message:", string(received))
+    conn.Close()
 }
+
+
