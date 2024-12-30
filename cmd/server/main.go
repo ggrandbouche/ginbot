@@ -1,48 +1,52 @@
+
 package main
 
 import (
+    "bufio"
     "fmt"
-    "log"
     "net"
-    "os"
-    "time"
 )
 
-const (
-    HOST = "0.0.0.0"
-    PORT = "8080"
-    TYPE = "tcp"
-)
+func handleConnection(conn net.Conn, messages chan string) {
+    defer conn.Close()
+    reader := bufio.NewReader(conn)
+
+    for {
+        msg, err := reader.ReadString('\n')
+        if err != nil {
+            fmt.Println("Connection closed:", err)
+            return
+        }
+
+        messages <- msg
+    }
+}
 
 func main() {
-    listen, err := net.Listen(TYPE, HOST+":"+PORT)
+    listener, err := net.Listen("tcp", ":8080")
+
     if err != nil {
-        log.Fatal(err)
-        os.Exit(1)
+        fmt.Println("Error starting server:", err)
+        return
     }
-    defer listen.Close()
-    for {
-        conn, err := listen.Accept()
-        if err != nil { 
-            log.Fatal(err)
-            os.Exit(1)
+    defer listener.Close()
+
+    fmt.Println("Server listening on port 8080")
+
+    messages := make(chan string)
+    go func() {
+        for msg := range messages {
+            fmt.Println("Message received:", msg)
         }
-        go handleRequest(conn)
+    }()
+
+    for {
+        conn, err := listener.Accept()
+
+        if err != nil {
+            fmt.Println("Error accepting connection:", err)
+            continue
+        }
+        go handleConnection(conn, messages)
     }
 }
-
-func handleRequest(conn net.Conn) {
-    buffer := make([]byte, 1024)
-    _, err := conn.Read(buffer)
-    if err != nil {
-        log.Fatal(err)
-    }
-    
-    time := time.Now().Format(time.ANSIC)
-    responseStr := fmt.Sprintf("Your message is: %v. Received time: %v", string(buffer[:]), time)
-    conn.Write([]byte(responseStr))
-
-    conn.Close()
-
-}
-
