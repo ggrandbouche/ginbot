@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -19,6 +18,11 @@ func handleConnection(conn net.Conn, messages chan string) {
         }
 
         messages <- msg
+        _, writeErr := conn.Write([]byte("Echo: " + msg))
+        if writeErr != nil {
+            fmt.Println("Error writing to connection:", writeErr)
+            return
+        }
     }
 }
 
