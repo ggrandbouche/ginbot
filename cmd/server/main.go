@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-    serverAddress := "18.118.160.185:8080"
+    serverAddress := "3.139.65.34:8080"
     messages := make(chan string)
 
     go func() {
