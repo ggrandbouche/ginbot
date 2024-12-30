@@ -29,7 +29,7 @@ func handleConnection(conn net.Conn, messages chan string) {
 
 func StartServer(address string, messages chan string) error {
     // start a server listening on port 8080
-    listener, err := net.Listen("tcp", address)
+    listener, err := net.Listen("tcp", "0.0.0.0:8080")
 
     // log errors
     if err != nil {
