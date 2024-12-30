@@ -1,4 +1,4 @@
-package main
+package network
 
 import (
     "bufio"
@@ -27,29 +27,19 @@ func handleConnection(conn net.Conn, messages chan string) {
     }
 }
 
-func main() {
+func StartServer(address string, messages chan string) error {
     // start a server listening on port 8080
-    listener, err := net.Listen("tcp", ":8080")
+    listener, err := net.Listen("tcp", address)
 
     // log errors
     if err != nil {
-        fmt.Println("Error starting server:", err)
-        return
+        return fmt.Errorf("Error starting server: %v", err)
     }
     // close listener on return
     defer listener.Close()
 
-    fmt.Println("Server listening on port 8080")
-
-    // make the channel to handle client messages
-    messages := make(chan string)
-    // go routine to print the messages received from clients
-    go func() {
-        for msg := range messages {
-            fmt.Println("Message received:", msg)
-        }
-    }()
-
+    fmt.Println("Server listening on", address)
+    
     // accept connections or throw error
     for {
         conn, err := listener.Accept()

@@ -1,4 +1,4 @@
-package main
+package gin
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ type Player struct {
 	points int
 }
 
-func main() {
+func gin() {
 	//header
 	fmt.Println("\n\n\t\tWelcome to ginbot - a bot the plays gin\n\t")
 	//initialize
