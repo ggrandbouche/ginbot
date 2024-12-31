@@ -6,10 +6,12 @@ import (
     "net"
 )
 
-func handleConnection(conn net.Conn) {
+func handleConnection(conn net.Conn, connections *[]net.Conn) {
     defer conn.Close()
     reader := bufio.NewReader(conn)
     writer := bufio.NewWriter(conn)
+
+    fmt.Println(connections)
 
     for {
         msg, err := reader.ReadString('\n')
@@ -43,12 +45,14 @@ func main() {
     fmt.Println("Server listening on port 8080")
 
     for {
+        connections := []net.Conn{}
         conn, err := listener.Accept()
 
         if err != nil {
             fmt.Println("Error accepting connection:", err)
             continue
         }
+        connections = append(connections, conn)
         go handleConnection(conn)
     }
 }
