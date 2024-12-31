@@ -11,8 +11,8 @@ func handleConnection(conn net.Conn, connections *[]net.Conn) {
     reader := bufio.NewReader(conn)
     writer := bufio.NewWriter(conn)
 
-    fmt.Printf("List of connections:", (*connections))
 
+    fmt.Println("List of connections:", (*connections))
     for {
         msg, err := reader.ReadString('\n')
         if err != nil {
@@ -53,6 +53,7 @@ func main() {
             continue
         }
         connections = append(connections, conn)
-        go handleConnection(conn)
+
+        go handleConnection(conn, &connections)
     }
 }
