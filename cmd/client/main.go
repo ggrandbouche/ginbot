@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-    conn, err := net.Dial("tcp", "18.189.13.250:8080")
+    conn, err := net.Dial("tcp", "18.217.82.22:8080")
     if err != nil {
         fmt.Println("Error connecting to server:", err)
         return
@@ -17,13 +17,29 @@ func main() {
 
     fmt.Println("Connected to the server. Type your message:")
 
-    scanner := bufio.NewScanner(os.Stdin)
-    for scanner.Scan() {
-        msg := scanner.Text() + "\n"
-        _, err := conn.Write([]byte(msg))
+    reader := bufio.NewReader(os.Stdin)
+    serverReader := bufio.NewReader(conn)
+    for {
+        fmt.Print("Enter message: ")
+        clientMessage, err := reader.ReadString('\n')
+        if err != nil {
+            fmt.Println("Error reading input:", err)
+            return
+        }
+
+        _, err = conn.Write([]byte(clientMessage))
         if err != nil {
             fmt.Println("Error sending message:", err)
             return
         }
+
+        serverResponse, err := serverReader.ReadString('\n')
+        if err != nil {
+            fmt.Println("Error reading server response:", err)
+            return
+        }
+
+        fmt.Print("Server respone: " + serverResponse)
+        
     }
 }

@@ -6,9 +6,10 @@ import (
     "net"
 )
 
-func handleConnection(conn net.Conn, messages chan string) {
+func handleConnection(conn net.Conn) {
     defer conn.Close()
     reader := bufio.NewReader(conn)
+    writer := bufio.NewWriter(conn)
 
     for {
         msg, err := reader.ReadString('\n')
@@ -17,12 +18,16 @@ func handleConnection(conn net.Conn, messages chan string) {
             return
         }
 
-        messages <- msg
-        _, writeErr := conn.Write([]byte("Echo: " + msg))
+        fmt.Printf("Message received: %s", msg)
+
+        response := "Echo: " + msg
+        _, writeErr := writer.WriteString(response)
         if writeErr != nil {
             fmt.Println("Error writing to connection:", writeErr)
             return
         }
+
+        writer.Flush()
     }
 }
 
@@ -37,13 +42,6 @@ func main() {
 
     fmt.Println("Server listening on port 8080")
 
-    messages := make(chan string)
-    go func() {
-        for msg := range messages {
-            fmt.Println("Message received:", msg)
-        }
-    }()
-
     for {
         conn, err := listener.Accept()
 
@@ -51,6 +49,6 @@ func main() {
             fmt.Println("Error accepting connection:", err)
             continue
         }
-        go handleConnection(conn, messages)
+        go handleConnection(conn)
     }
 }
