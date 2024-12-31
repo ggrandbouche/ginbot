@@ -11,6 +11,7 @@ func handleConnection(conn net.Conn, connections *[]net.Conn) {
     reader := bufio.NewReader(conn)
     writer := bufio.NewWriter(conn)
 
+    connections = append(connections, conn)
 
     fmt.Println("List of connections:", (*connections))
     for {
@@ -44,16 +45,19 @@ func main() {
 
     fmt.Println("Server listening on port 8080")
 
-    for {
-        connections := []net.Conn{}
-        conn, err := listener.Accept()
+    connections := []net.Conn{}
+
+    for len(connections) < 2 {
+      conn, err := listener.Accept()
 
         if err != nil {
             fmt.Println("Error accepting connection:", err)
             continue
         }
-        connections = append(connections, conn)
 
         go handleConnection(conn, &connections)
     }
+    
+    fmt.Println("connections complete.")
+
 }
