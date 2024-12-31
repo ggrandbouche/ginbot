@@ -48,6 +48,7 @@ func main() {
     connections := []net.Conn{}
 
     for len(connections) < 2 {
+      fmt.Println("connnections len: ", len(connections))
       conn, err := listener.Accept()
 
         if err != nil {
