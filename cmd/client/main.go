@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-    conn, err := net.Dial("tcp", "18.217.82.22:8080")
+    conn, err := net.Dial("tcp", "3.17.147.118:8080")
     if err != nil {
         fmt.Println("Error connecting to server:", err)
         return
