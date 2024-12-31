@@ -11,7 +11,7 @@ func handleConnection(conn net.Conn, connections *[]net.Conn) {
     reader := bufio.NewReader(conn)
     writer := bufio.NewWriter(conn)
 
-    connections = append(*connections, conn)
+    *connections = append(*connections, conn)
 
     fmt.Println("List of connections:", (*connections))
     for {
