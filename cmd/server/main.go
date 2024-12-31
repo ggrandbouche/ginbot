@@ -6,32 +6,19 @@ import (
     "net"
 )
 
-func handleConnection(conn net.Conn, connections *[]net.Conn) {
+type Message struct  {
+    conn net.Conn
+    text []byte
+}
+
+func handleConnection(conn net.Conn, chan messages) {
     defer conn.Close()
-    reader := bufio.NewReader(conn)
-    writer := bufio.NewWriter(conn)
+    // read the channel, then send stuff to the client
+    clients := make(map[string]net.Conn)
+    msg := <-message
 
-    *connections = append(*connections, conn)
-
-    fmt.Println("List of connections:", (*connections))
-    for {
-        msg, err := reader.ReadString('\n')
-        if err != nil {
-            fmt.Println("Connection closed:", err)
-            return
-        }
-
-        fmt.Printf("Message received: %s", msg)
-
-        response := "Echo: " + msg
-        _, writeErr := writer.WriteString(response)
-        if writeErr != nil {
-            fmt.Println("Error writing to connection:", writeErr)
-            return
-        }
-
-        writer.Flush()
-    }
+    clients[msg.Conn.RemoteAddr().String()] = msg.Conn
+    fmt.Println("New client = ", msg.Conn.RemoteAddr().String())
 }
 
 func main() {
@@ -43,21 +30,16 @@ func main() {
     }
     defer listener.Close()
 
-    fmt.Println("Server listening on port 8080")
+    messages := make(chan Message)
 
-    connections := []net.Conn{}
-
-    for len(connections) < 2 {
-      conn, err := listener.Accept()
-
+    for {
+        conn, err := listener.Accept()
         if err != nil {
             fmt.Println("Error accepting connection:", err)
-            continue
+            return
         }
-
-        go handleConnection(conn, &connections)
+        messages <- Message{conn: conn, text: nil}
+        fmt.Println("Connection accepted: ", conn.RemoteAddr())
+        go handleConnection(conn, messages)
     }
-    
-    fmt.Println("connections complete.")
-
 }
