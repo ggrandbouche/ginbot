@@ -11,9 +11,15 @@ type Message struct {
 	message string
 }
 
+const (
+    serverType = "tcp"
+    host = "localhost"
+    port = ":8080"
+)
+
 func main() {
     // open listener
-	listener, err := net.Listen("tcp", "localhost:8080")
+	listener, err := net.Listen(serverType, port)
 	if err != nil {
 		fmt.Println("Error starting server", err)
 		return
