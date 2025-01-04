@@ -1,45 +1,71 @@
 package main
 
 import (
-    "bufio"
-    "fmt"
-    "net"
+	"bufio"
+	"fmt"
+	"net"
+    "os"
 )
 
-type Message struct  {
-    conn net.Conn
-    text []byte
-}
-
-func handleConnection(conn net.Conn, chan messages) {
-    defer conn.Close()
-    // read the channel, then send stuff to the client
-    clients := make(map[string]net.Conn)
-    msg := <-message
-
-    clients[msg.Conn.RemoteAddr().String()] = msg.Conn
-    fmt.Println("New client = ", msg.Conn.RemoteAddr().String())
+type Message struct {
+	conn    net.Conn
+	message string
 }
 
 func main() {
-    listener, err := net.Listen("tcp", ":8080")
+	listener, err := net.Listen("tcp", "localhost:8080")
+	if err != nil {
+		fmt.Println("Error starting server", err)
+		return
+	}
+	defer listener.Close()
+	fmt.Println("Server started")
 
-    if err != nil {
-        fmt.Println("Error starting server:", err)
-        return
-    }
-    defer listener.Close()
+	ch := make(chan Message)
+	var connections []net.Conn
 
-    messages := make(chan Message)
+	go func() {
+		for msg := range ch {
+			for _, conn := range connections {
+				if conn != msg.conn {
+                    if msg.message == "quit" {
+                        os.Exit(1)
+                    }
+					writer := bufio.NewWriter(conn)
+					_, err := writer.WriteString(msg.message)
+					if err != nil {
+						fmt.Println("Error writing to connection:", err)
+						continue
+					}
+					writer.Flush()
+				}
+			}
+		}
+	}()
 
-    for {
-        conn, err := listener.Accept()
-        if err != nil {
-            fmt.Println("Error accepting connection:", err)
-            return
-        }
-        messages <- Message{conn: conn, text: nil}
-        fmt.Println("Connection accepted: ", conn.RemoteAddr())
-        go handleConnection(conn, messages)
-    }
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			fmt.Println("Error accepting connection", err)
+            continue
+		}
+        connections = append(connections, conn)
+		go handleConnection(conn, ch)
+	}
 }
+
+func handleConnection(conn net.Conn, ch chan Message) {
+	defer conn.Close()
+	fmt.Println("Client connected:", conn.RemoteAddr().String())
+	reader := bufio.NewReader(conn)
+
+	for {
+		msg, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println("Connection closed:", err)
+			return
+		}
+		ch <- Message{conn: conn, message: msg}
+	}
+}
+
