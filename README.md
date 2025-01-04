@@ -1,5 +1,5 @@
 # ginbot
-
+A work in progress
 ## run code
 
 To run code in the folder ginbot/src,
