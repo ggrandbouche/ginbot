@@ -4,18 +4,20 @@ import (
 	"bufio"
 	"fmt"
 	"net"
+    "github/ggrandbouche/ginbot/pkg/gin"
+    "sync"
 )
-
-type Message struct {
-	conn    net.Conn
-	message string
-}
 
 const (
     serverType = "tcp"
     host = "localhost"
     port = ":8080"
 )
+
+type Connection struct {
+    conn net.Conn
+    player int
+}
 
 func main() {
     // open listener
@@ -27,51 +29,55 @@ func main() {
 	defer listener.Close()
 	fmt.Println("Server started")
     // initialize channel and connections slice
-	ch := make(chan Message)
-	var connections []net.Conn
-    // anonymous go routine to handle reading other connections messages
-    // only anonymous cuz passing stuff is annoying
-	go func() {
-		for msg := range ch {
-			for _, conn := range connections {
-				if conn != msg.conn {
-                    // if the message in the channel isnt from the current connection
-                    // then write it to the current connection
-                    writer := bufio.NewWriter(conn) 
-					_, err := writer.WriteString(msg.message)
-					if err != nil {
-						fmt.Println("Error writing to connection:", err)
-						continue
-					}
-                    writer.Flush()
-				}
-			}
-		}
-	}()
-    // accept connections
-	for {
+    var connections []Connection
+    var wg sync.WaitGroup
+
+    input := make(chan string)
+    output := make(chan gin.Output)
+    startGin := make(chan string)
+
+    wg.Add(1)
+    go func() {
+        defer wg.Done()
+        <-startGin
+        fmt.Print("started gin")
+        go gin.Gin(input, output)
+
+        for outputCP, ok := <-output; ok; outputCP, ok = <-output {
+            for _, conn := range connections {
+                if conn.player == outputCP.Player || outputCP.Player == 2 {
+                    fmt.Println("writing, connection: ", conn.conn.LocalAddr())
+                    conn.conn.Write([]byte(outputCP.Output))
+                }
+            }
+        }
+    }()
+
+    for i := 0; i < 2; i++ {
 		conn, err := listener.Accept()
 		if err != nil {
 			fmt.Println("Error accepting connection", err)
             continue
 		}
-        connections = append(connections, conn)
-		go handleConnection(conn, ch)
+        connections = append(connections, Connection{conn: conn, player: i})
+		go handleConnection(conn, input)
 	}
+    startGin<- " "
+    wg.Wait()
 }
 
-func handleConnection(conn net.Conn, ch chan Message) {
+func handleConnection(conn net.Conn, input chan string) {
 	defer conn.Close()
-	fmt.Println("Client connected:", conn.RemoteAddr().String())
-	reader := bufio.NewReader(conn)
-    // get messages from each client and put in channel
+    fmt.Println("Client connected:", conn.RemoteAddr().String())
+    reader := bufio.NewReader(conn)
+
 	for {
-		msg, err := reader.ReadString('\n')
+		tempInput, err := reader.ReadString('\n')
 		if err != nil {
 			fmt.Println("Connection closed:", err)
 			return
 		}
-		ch <- Message{conn: conn, message: msg}
+        input<- tempInput
 	}
 }
 

@@ -1,126 +1,82 @@
 package gin
 
-import (
-	"fmt"
+import(
+    "strings"
+    "strconv"
+    "fmt"
 )
 
-func gameLoop(board *GameBoard, p1 Player, p2 Player) (bool, int) {
-	var gameOver = false
+type Output struct {
+    Output string
+    Player int  // 0, 1, 2 -- p1, p2, both
+}
 
-	for !gameOver {
-		var input int
+func Gin(input <-chan string, output chan<- Output) {
+    board := GameBoard{
+        deck: []Card{}, 
+        discard: []Card{}, 
+        p1:  Player{name:"", hand: []Card{}, pts:0}, 
+        p2: Player{name:"", hand: []Card{}, pts:0},
+    }
+    board.IntitializeBoard()
+    board.Shuffle()
+    board.DealHands()
+    //gameOver := false
 
-		board.SortHands()
+    output <- Output{Output: "I:Welcome to the game of gin\n Please enter your name\n> ", Player: 2}
+    board.p1.name = <-input 
+    board.p2.name = <-input
 
-		fmt.Print("\n\n\n-----------------------------------------\n")
-		fmt.Printf("\n%s's hand: ", p1.name)
-		printHand(board.hand1)
-		fmt.Print("This is the top of the discard pile: ")
-		printCard(board.discard[len(board.discard)-1])
-		fmt.Println("\nDraw new card(1) or take top of discard pile(2)")
-		fmt.Print("> ")
-		fmt.Scan(&input)
-		if input == 1 {
-			var deltCard = board.DealCard()
-			board.hand1 = append(board.hand1, deltCard)
-			fmt.Print("You drew: ")
-			printCard(deltCard)
-			fmt.Println()
-		} else if input == 2 {
-			board.hand1 = append(board.hand1, board.discard[len(board.discard)-1])
-			board.discard = board.discard[:len(board.discard)-1]
-		} else {
-			fmt.Println("Please enter 1 or 2!")
-		}
-		fmt.Println("Please enter the index of the card you would like to discard, starting at index 0")
-		sortHand(board.hand1)
-		printHand(board.hand1)
-		fmt.Println("[0]  [1]  [2]  [3]  [4]  [5]  [6]  [7]  [8]  [9]  [10]")
-		fmt.Print("> ")
-		fmt.Scan(&input)
-		board.discard = append(board.discard, board.hand1[input])
-		board.hand1 = append(board.hand1[:input], board.hand1[input+1:]...)
-		P1_pts := groupify(board.hand1)
-		P2_pts := groupify(board.hand2)
-		fmt.Printf("You have %d deadwood points in your hand\n", P1_pts)
-		if P1_pts == 0 {
-			fmt.Printf("%s goes gin!", p1.name)
-			return true, P2_pts + 25
-		} else if P1_pts <= 10 {
-			fmt.Printf("Would you like to knock with %d points? yes(1), no(2)\n> ", P1_pts)
-			fmt.Scan(&input)
-			if input == 1 {
-				fmt.Printf("%s has %d deadwood points.\n%s has %d deadwood points.\n", 
-							p1.name, P1_pts, p2.name, P2_pts)
-				var pointDiff = P2_pts - P1_pts
-				if pointDiff > 0 {
-					fmt.Printf("%s wins with a knock! \n", p1.name)
-					return true, pointDiff
-				} else if pointDiff < 0 {
-					fmt.Printf("%s undercuts the knock! \n", p2.name)
-					pointDiff = -pointDiff
-					return false, pointDiff + 20
-				} else {
-					fmt.Println("Players tied on the knock! ")
-					return true, pointDiff
-				}
-			}
-		}
+    output <- Output{Output: "I:" + turn(board, 0) + "Enter an action: ", Player: 0}
+    fmt.Print("test")
+    output <- Output{Output: turn(board, 0) + parser(&board, 0, <-input), Player: 0}
 
-		//Player 2's turn
-		fmt.Print("\n\n\n-----------------------------------------\n")
-		fmt.Printf("\n%s's hand: ", p2.name)
-		printHand(board.hand2)
-		fmt.Print("This is the top of the discard pile: ")
-		printCard(board.discard[len(board.discard)-1])
-		fmt.Print("\nDraw new card(1) or take top of discard pile(2)\n> ")
-		fmt.Scan(&input)
-		if input == 1 {
-			var deltCard = board.DealCard()
-			board.hand2 = append(board.hand2, deltCard)
-			fmt.Print("You drew: ")
-			printCard(deltCard)
-			fmt.Println()
-		} else if input == 2 {
-			board.hand2 = append(board.hand2, board.discard[len(board.discard)-1])
-			board.discard = board.discard[:len(board.discard)-1]
-		} else {
-			fmt.Println("Please enter 1 or 2!")
-		}
-		fmt.Println("Please enter the index of the card you would like to discard, starting at index 0")
-		sortHand(board.hand2)
-		printHand(board.hand2)
-		fmt.Println("[0]  [1]  [2]  [3]  [4]  [5]  [6]  [7]  [8]  [9]  [10]")
-		fmt.Print("> ")
-		fmt.Scan(&input)
-		board.discard = append(board.discard, board.hand2[input])
-		board.hand2 = append(board.hand2[:input], board.hand2[input+1:]...)
-		P1_pts = groupify(board.hand1)
-		P2_pts = groupify(board.hand2)
-		fmt.Printf("You have %d deadwood points in your hand\n", P2_pts)
-		if P2_pts == 0 {
-			fmt.Printf("%s goes gin!\n", p2.name)
-			return true, P1_pts + 25
-		} else if P2_pts <= 10 {
-			fmt.Printf("Would you like to knock with %d points? yes(1), no(2)\n> ", P2_pts)
-			fmt.Scan(&input)
-			if input == 1 {
-				fmt.Printf("%s has %d deadwood points.\n%s has %d deadwood points.\n", 
-							p1.name, P1_pts, p2.name, P2_pts)
-				var pointDiff = P2_pts - P1_pts
-				if pointDiff > 0 {
-					fmt.Printf("%s wins with a knock! ", p2.name)
-					return false, pointDiff
-				} else if pointDiff < 0 {
-					fmt.Printf("%s undercuts the knock! ", p1.name)
-					pointDiff = -pointDiff
-					return true, pointDiff
-				} else {
-					fmt.Println("Players tied on the knock! ")
-					return true, pointDiff
-				}
-			}
-		}
-	}
-	return true, 0
+    output <- Output{Output: "I:" + turn(board, 1) + "Enter an action: ", Player: 1}
+    output <- Output{Output: turn(board, 1) + parser(&board, 2, <-input), Player: 1}
+    /*
+    for !gameOver {
+        fmt.Println("inside loop")
+        output <- Output{Output: turn(board, 0) + parser(&board, 0, <-input), Player: 0}
+        output <- Output{Output: turn(board, 0) + parser(&board, 0, <-input), Player: 0}
+
+        output <- Output{Output: turn(board, 1) + parser(&board, 2, <-input), Player: 1}
+        output <- Output{Output: turn(board, 1) + parser(&board, 2, <-input), Player: 1}
+    }
+    */
+    
+}
+
+func turn(gb GameBoard, player int) string {
+    if player == 0 {
+        return "Hand: " + printHand(gb.p1.hand) + "Discard pile: " + printCard(gb.discard[len(gb.discard)-1])
+    } else {
+        return "Hand: " + printHand(gb.p2.hand) + "Discard pile: " + printCard(gb.discard[len(gb.discard)-1])
+    }
+}
+
+func parser(gb *GameBoard, player int, input string) string {
+
+    fmt.Println("parser called")
+    inputArr := strings.Split(input, " ")
+
+    if strings.ToLower(inputArr[0]) == "draw" {
+        if strings.ToLower(inputArr[1]) == "from" && strings.ToLower(inputArr[2]) == "discard" {
+            return drawFromDiscard(gb, player)
+        } else {
+            return drawCard(gb, player)
+        }
+    } else if strings.ToLower(inputArr[0]) == "discard" {
+        index, err := strconv.Atoi(inputArr[1])
+        if err != nil {
+            fmt.Println("Error reading index of card to discard")
+            return ""
+        }
+        return discard(gb, player, index)
+    } else if strings.ToLower(inputArr[0]) == "knock" {
+        return knock(gb, player)
+    } else if strings.ToLower(inputArr[0]) == "go" && strings.ToLower(inputArr[1]) == "gin" {
+        return goGin(gb, player) 
+    }
+
+    return "invalid" 
 }
