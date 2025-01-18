@@ -23,16 +23,15 @@ func Gin(input <-chan string, output chan<- Output) {
     board.DealHands()
     //gameOver := false
 
-    output <- Output{Output: "I:Welcome to the game of gin\n Please enter your name\n> ", Player: 2}
+    output <- Output{Output: "I:Welcome to the game of gin\n Please enter your name\n>", Player: 2}
     board.p1.name = <-input 
     board.p2.name = <-input
 
-    output <- Output{Output: "I:" + turn(board, 0) + "Enter an action: ", Player: 0}
-    fmt.Print("test")
-    output <- Output{Output: turn(board, 0) + parser(&board, 0, <-input), Player: 0}
+    output <- Output{Output: "I:" + turn(board, 0) + "\n>", Player: 0}
+    output <- Output{Output: "I:" + turn(board, 0) + parser(&board, 0, <-input), Player: 0}
 
-    output <- Output{Output: "I:" + turn(board, 1) + "Enter an action: ", Player: 1}
-    output <- Output{Output: turn(board, 1) + parser(&board, 2, <-input), Player: 1}
+    output <- Output{Output: "I:" + turn(board, 1) + "\n>", Player: 1}
+    output <- Output{Output: "I:" + turn(board, 1) + parser(&board, 2, <-input), Player: 1}
     /*
     for !gameOver {
         fmt.Println("inside loop")

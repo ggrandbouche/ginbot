@@ -40,13 +40,11 @@ func main() {
     go func() {
         defer wg.Done()
         <-startGin
-        fmt.Print("started gin")
         go gin.Gin(input, output)
 
         for outputCP, ok := <-output; ok; outputCP, ok = <-output {
             for _, conn := range connections {
                 if conn.player == outputCP.Player || outputCP.Player == 2 {
-                    fmt.Println("writing, connection: ", conn.conn.LocalAddr())
                     conn.conn.Write([]byte(outputCP.Output))
                 }
             }

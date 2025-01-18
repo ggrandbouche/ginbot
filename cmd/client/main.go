@@ -26,9 +26,7 @@ func main() {
 	serverReader := bufio.NewReader(conn)
 	for {
 		// get the server response
-        fmt.Println("getingg....")
 		serverResponse, err := serverReader.ReadString('>')
-        fmt.Println("got respoonse")
 		if err != nil {
 			fmt.Println("Error reading server response:", err)
 			return
@@ -38,7 +36,7 @@ func main() {
             fmt.Print(serverResponse)
             getInput(conn)
         } else {
-            fmt.Println(serverResponse)
+            fmt.Println(serverResponse[:len(serverResponse)-1])
         }
     }
 }
