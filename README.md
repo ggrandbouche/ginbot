@@ -14,6 +14,9 @@ in your terminal from the ginbot dir
 go run cmd/server/main.go
 go run cmd/client/main.go
 ```
-note that there must be two connecions to player gin currently
-
+## Current issues
+the way parsing happens kidna sucks,
+no loop to play multiple games
+no comments
+nothing is very refined
 
