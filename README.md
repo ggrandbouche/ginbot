@@ -1,17 +1,20 @@
 # ginbot
+
+
+## Local use
+### script
+in order to use the script you must be in a tmux session
+run 
+```
+./testing-script
+``` 
+in your terminal from the ginbot dir
+### no script
+```go run cmd/server/main.go```
+```go run cmd/client/main.go```
+note that there must be two connecions to player gin currently
+=======
 A work in progress
 ## run code
 
-To run code in the folder ginbot/src,
 
-        go run .
-
-To run code in the folder /ginbot,
-
-        go run src/*
-
-## use the server
-
-on the server run cmd/server/main.go
-
-in a terminal connect to the server by running cmd/client/main.go

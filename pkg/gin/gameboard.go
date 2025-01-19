@@ -1,7 +1,6 @@
 package gin
 
 import (
-	"fmt"
 	"math/rand/v2"
 )
 
@@ -11,12 +10,17 @@ Game board structures
 type Card struct {
 	value, suit int
 }
+type Player struct {
+    name string
+    hand []Card 
+    pts int
+}
 
 type GameBoard struct {
 	deck    []Card
-	hand1   []Card
-	hand2   []Card
 	discard []Card
+    p1 Player
+    p2 Player
 }
 
 func (board *GameBoard) IntitializeBoard() {
@@ -26,8 +30,8 @@ func (board *GameBoard) IntitializeBoard() {
 	}
 
 	//initialize hand1, hand2, discard
-	board.hand1 = make([]Card, 0, 11)
-	board.hand2 = make([]Card, 0, 11)
+	board.p1.hand = make([]Card, 0, 11)
+	board.p2.hand = make([]Card, 0, 11)
 	board.discard = make([]Card, 0, 52)
 }
 
@@ -47,28 +51,31 @@ func (board *GameBoard) Shuffle() {
 func (board *GameBoard) DealHands() {
 	for i := 0; i < 20; i++ {
 		if i%2 == 0 {
-			board.hand1 = append(board.hand1, board.DealCard())
+			board.p1.hand = append(board.p1.hand, board.DealCard())
 		} else {
-			board.hand2 = append(board.hand2, board.DealCard())
+			board.p2.hand = append(board.p2.hand, board.DealCard())
 		}
 	}
     board.discard = append(board.discard, board.DealCard())
 }
 
-func printHand(hand []Card) {
+func printHand(hand []Card) string {
 	value := []string{" A", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", "10", " J", " Q", " K"}
 	suit := []string{"♠", "♦", "♣", "♥"}
+    var ret string
 	for x, card := range hand {
-		fmt.Printf("%s%s", value[card.value], suit[card.suit])
-		if (x != len(hand)-1) {fmt.Print(", ")}
+		ret += value[card.value] + suit[card.suit]
+		if (x != len(hand)-1) {ret += ", "}
 	}
-	fmt.Println()
+    ret += "\n"
+    return ret
 }
 
-func printCard(card Card) {
+func printCard(card Card) string {
 	value := []string{" A", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", "10", " J", " Q", " K"}
 	suit := []string{"♠", "♦", "♣", "♥"}
-	fmt.Printf(" %s%s ", value[card.value], suit[card.suit])
+    cardString :=  value[card.value ] + suit[card.suit] + "\n"
+    return cardString
 }
 
 func (board *GameBoard) DealCard() Card {
@@ -78,8 +85,8 @@ func (board *GameBoard) DealCard() Card {
 }
 
 func (board *GameBoard) SortHands() {
-	board.hand1 = sortHand(board.hand1)
-	board.hand2 = sortHand(board.hand2)
+	board.p1.hand = sortHand(board.p1.hand)
+	board.p2.hand = sortHand(board.p2.hand)
 }
 
 func sortHand(hand []Card) []Card {
@@ -205,9 +212,7 @@ func calcTotal(hand []Card) int {
 	for _, card := range hand {
 		total += card.value
 	}
-	return total
-}
-
+	return total }
 func calcTotalGroups(hand [][]Card) int {
 	total := 0
 	for _, slice := range hand {
@@ -216,4 +221,13 @@ func calcTotalGroups(hand [][]Card) int {
 		}
 	}
 	return total
+}
+
+
+func getPlayer(gb *GameBoard, n int) *Player {
+    if n == 0 { 
+        return &gb.p1 
+    } else { 
+        return &gb.p2 
+    }
 }
