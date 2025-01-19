@@ -6,44 +6,40 @@ import(
 
 func drawCard(gb *GameBoard, player int) string {
     var output string
-    hand :=  getPlayer(gb, player).hand
-    hand = append(hand, gb.deck[len(gb.deck)-1])
+    p :=  getPlayer(gb, player)
+    
+    p.hand = append(p.hand, gb.deck[len(gb.deck)-1])
     gb.deck = gb.deck[:len(gb.deck)-1]
 
-    output += printHand(hand) + "\n>" 
+    output += "\nPick a card to discard\n" + printHand(p.hand) + "[0]  [1]  [2]  [3]  [4]  [5]  [6]  [7]  [8]  [9]  [10]\n>" 
 
     return output
 }
 
-func discard(gb *GameBoard, player int, n int) string {
-    var output string
-    hand := getPlayer(gb, player).hand
-
-    gb.discard = append(gb.discard, hand[n])
-
-    output += "\n" + printHand(hand) + "\n"
-
-    return output
+func discard(gb *GameBoard, player int, n int) {
+    p := getPlayer(gb, player)
+    gb.discard = append(gb.discard, p.hand[n])
+    p.hand = append(p.hand[:n], p.hand[n+1:]...)
 }
 
 func drawFromDiscard (gb *GameBoard, player int) string {
     var output string
-    hand := getPlayer(gb, player).hand
+    p := getPlayer(gb, player)
 
-    hand = append(hand, gb.discard[len(gb.discard)-1])
+    p.hand = append(p.hand, gb.discard[len(gb.discard)-1])
     gb.discard = gb.discard[:len(gb.discard)-1]
 
-    output += "\n" + printHand(hand) + "\n>"
+    output += "\nTo declare gin, enter: go in, to knock, enter: knock\nOr pick a card to discard\n" + printHand(p.hand) + "[0]  [1]  [2]  [3]  [4]  [5]  [6]  [7]  [8]  [9]  [10]\n>" 
 
     return output
 }
 
-func knock(gb *GameBoard, player int) string {
+func knock(gb *GameBoard, player int) (string, bool) {
     var output string
 
     current := getPlayer(gb, player)
     currentPts := groupify(current.hand)
-    player ^= player
+    player ^= 1 
     other := getPlayer(gb, player)
     otherPts := groupify(other.hand)
 
@@ -61,22 +57,22 @@ func knock(gb *GameBoard, player int) string {
     } else {
         output += "Players tied on the knock\n>"
     }
-    return output
+    return output, true
 }
 
 // need to check if any cards can be player on the other players hand later
-func goGin(gb *GameBoard, player int) string {
+func goGin(gb *GameBoard, player int) (string, bool) {
     var output string
 
     current := getPlayer(gb, player)
-    player ^= player
+    player ^= 1
     other := getPlayer(gb, player)
     pts := 50+groupify(other.hand)
 
     output += current.name + " Went gin and gets " + strconv.Itoa(pts) + " points\n>"
     current.pts += pts
     
-    return output
+    return output, true
 }
 
 

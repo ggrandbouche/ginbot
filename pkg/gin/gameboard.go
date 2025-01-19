@@ -225,7 +225,7 @@ func calcTotalGroups(hand [][]Card) int {
 
 
 func getPlayer(gb *GameBoard, n int) *Player {
-    if n == 1 { 
+    if n == 0 { 
         return &gb.p1 
     } else { 
         return &gb.p2 

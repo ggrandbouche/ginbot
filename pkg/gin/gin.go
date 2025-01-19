@@ -3,7 +3,7 @@ package gin
 import(
     "strings"
     "strconv"
-    "fmt"
+    //"fmt"
 )
 
 type Output struct {
@@ -21,28 +21,27 @@ func Gin(input <-chan string, output chan<- Output) {
     board.IntitializeBoard()
     board.Shuffle()
     board.DealHands()
-    //gameOver := false
 
-    output <- Output{Output: "I:Welcome to the game of gin\n Please enter your name\n>", Player: 2}
+    output <- Output{Output: "I:Welcome to the game of gin\nPlease enter your name\n>", Player: 0}
     board.p1.name = <-input 
+    output <- Output{Output: "I:Welcome to the game of gin\nPlease enter your name\n>", Player: 1}
     board.p2.name = <-input
 
-    output <- Output{Output: "I:" + turn(board, 0) + "\n>", Player: 0}
-    output <- Output{Output: "I:" + turn(board, 0) + parser(&board, 0, <-input), Player: 0}
-
-    output <- Output{Output: "I:" + turn(board, 1) + "\n>", Player: 1}
-    output <- Output{Output: "I:" + turn(board, 1) + parser(&board, 2, <-input), Player: 1}
-    /*
-    for !gameOver {
-        fmt.Println("inside loop")
-        output <- Output{Output: turn(board, 0) + parser(&board, 0, <-input), Player: 0}
-        output <- Output{Output: turn(board, 0) + parser(&board, 0, <-input), Player: 0}
-
-        output <- Output{Output: turn(board, 1) + parser(&board, 2, <-input), Player: 1}
-        output <- Output{Output: turn(board, 1) + parser(&board, 2, <-input), Player: 1}
+    for curPlayer := 0; curPlayer != 2; curPlayer ^= 1{
+        board.SortHands()
+        output <- Output{Output: "I:" + turn(board, curPlayer) + "\n>", Player: curPlayer}
+        tempOutput, gameOver := parser(&board, curPlayer, <-input)
+        if gameOver {
+            output <- Output{Output: tempOutput, Player: 2}
+            break
+        } else {
+            output <- Output{Output: "I:" + tempOutput, Player: curPlayer}
+            tempOutput, gameOver = parser(&board, curPlayer, <-input)
+            board.SortHands()
+            output <- Output{Output: turn(board, curPlayer) + tempOutput, Player: curPlayer}
+        }
     }
-    */
-    
+   
 }
 
 func turn(gb GameBoard, player int) string {
@@ -53,29 +52,23 @@ func turn(gb GameBoard, player int) string {
     }
 }
 
-func parser(gb *GameBoard, player int, input string) string {
-
-    fmt.Println("parser called")
-    inputArr := strings.Split(input, " ")
+func parser(gb *GameBoard, player int, input string) (string, bool) {
+    inputArr := strings.Fields(input)
 
     if strings.ToLower(inputArr[0]) == "draw" {
-        if strings.ToLower(inputArr[1]) == "from" && strings.ToLower(inputArr[2]) == "discard" {
-            return drawFromDiscard(gb, player)
-        } else {
-            return drawCard(gb, player)
+        if len(inputArr) > 2 && strings.ToLower(inputArr[1]) == "from" && strings.ToLower(inputArr[2]) == "discard" {
+            return drawFromDiscard(gb, player), false
+        } else if len(inputArr) == 1 {
+            return drawCard(gb, player), false
         }
-    } else if strings.ToLower(inputArr[0]) == "discard" {
-        index, err := strconv.Atoi(inputArr[1])
-        if err != nil {
-            fmt.Println("Error reading index of card to discard")
-            return ""
-        }
-        return discard(gb, player, index)
+    } else if index, err := strconv.Atoi(inputArr[0]); err == nil && index <= 10{
+        discard(gb, player, index)
+        return "\n>", false
     } else if strings.ToLower(inputArr[0]) == "knock" {
         return knock(gb, player)
-    } else if strings.ToLower(inputArr[0]) == "go" && strings.ToLower(inputArr[1]) == "gin" {
+    } else if strings.ToLower(inputArr[0]) == "go" && strings.ToLower(inputArr[1]) == "gin" || strings.ToLower(inputArr[0]) == "gin" {
         return goGin(gb, player) 
     }
 
-    return "invalid" 
+    return "invalid", false
 }
