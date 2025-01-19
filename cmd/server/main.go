@@ -42,7 +42,6 @@ func main() {
         <-startGin
         go gin.Gin(input, output)
 
-
         for outputCP, ok := <-output; ok; outputCP, ok = <-output {
             for _, conn := range connections {
                 if conn.player == outputCP.Player || outputCP.Player == 2 {
@@ -51,11 +50,6 @@ func main() {
             }
         }
     }()
-
-    for len(connections) < 2 {
-      fmt.Println("connnections len: ", len(connections))
-      conn, err := listener.Accept()
-
 
     for i := 0; i < 2; i++ {
 		conn, err := listener.Accept()
