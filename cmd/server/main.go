@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
     "github/ggrandbouche/ginbot/pkg/gin"
+    "github/ggrandbouche/ginbot/pkg/parsing"
     "sync"
 )
 
@@ -35,6 +36,8 @@ func main() {
     input := make(chan string)
     output := make(chan gin.Output)
     startGin := make(chan string)
+
+    go parsing.Parser(input, output)
 
     wg.Add(1)
     go func() {
